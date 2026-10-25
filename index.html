@@ -12,7 +12,7 @@
 
 <meta name="theme-color" content="#101015">
 
-<title>ColorPreset v0.5</title>
+<title>ColorPreset v0.6</title>
 
 <style>
 
@@ -40,7 +40,7 @@ h2{font-size:16px;margin:0 0 12px}
 
 .preview{width:100%;aspect-ratio:16/9;background:#09090d;border-radius:12px;overflow:hidden;display:grid;place-items:center;margin-top:12px;position:relative}
 
-.preview canvas{width:100%;height:100%;object-fit:contain}
+.preview canvas{display:block;width:100%;height:100%;object-fit:contain}
 
 .empty{text-align:center;color:var(--muted);padding:22px;position:absolute;pointer-events:none}
 
@@ -74,7 +74,7 @@ button:disabled{opacity:.45}
 
 .hidden{display:none}
 
-video.source-video{position:fixed;width:2px;height:2px;left:-10px;bottom:0;opacity:.01;pointer-events:none}
+video.source-video{display:block;width:100%;max-height:240px;background:#08080c;border-radius:12px;margin-top:12px}
 
 a{display:inline-block;color:#ddd4ff;margin-top:12px;overflow-wrap:anywhere}
 
@@ -94,7 +94,7 @@ a{display:inline-block;color:#ddd4ff;margin-top:12px;overflow-wrap:anywhere}
 
 <h1>ColorPreset</h1>
 
-<div class="sub">Prototype 0.5 · correction et export améliorés</div>
+<div class="sub">Prototype 0.6 · aperçu et export corrigés</div>
 
 </div>
 
@@ -108,15 +108,23 @@ a{display:inline-block;color:#ddd4ff;margin-top:12px;overflow-wrap:anywhere}
 
 <input class="file" id="videoFile" type="file" accept="video/*">
 
+<video id="source" class="source-video" playsinline webkit-playsinline muted controls preload="metadata"></video>
+
+<div class="sub">Vidéo source (utilise Lecture si l’aperçu corrigé reste noir).</div>
+
 <div class="preview">
 
 <canvas id="canvas" width="960" height="540"></canvas>
 
-<div class="empty" id="empty">L’aperçu de ta vidéo apparaîtra ici.</div>
+<div class="empty" id="empty">Importe une vidéo, puis appuie sur Lecture.</div>
 
 </div>
 
 <div class="status" id="videoStatus">Aucune vidéo sélectionnée.</div>
+
+<button id="previewPlay" disabled>Lire l’aperçu corrigé</button>
+
+<button class="secondary" id="previewPause" disabled>Mettre en pause</button>
 
 </div>
 
@@ -124,7 +132,7 @@ a{display:inline-block;color:#ddd4ff;margin-top:12px;overflow-wrap:anywhere}
 
 <h2>2. Importer ton preset After Effects</h2>
 
-<div class="sub">Le fichier FFX est analysé pour repérer des noms d’effets lisibles. Cette détection ne décode pas leurs paramètres.</div>
+<div class="sub">Cette version peut repérer quelques noms lisibles dans un FFX, mais ne peut pas appliquer automatiquement ses paramètres.</div>
 
 <input class="file" id="presetFile" type="file" accept=".ffx,application/octet-stream">
 
@@ -186,15 +194,19 @@ a{display:inline-block;color:#ddd4ff;margin-top:12px;overflow-wrap:anywhere}
 
 <button class="secondary" id="reset">Réinitialiser les réglages</button>
 
-<div class="status">Les corrections manuelles sont appliquées au canvas utilisé pour l’export. Elles ne sont pas automatiquement extraites du preset FFX.</div>
+<div class="status">
+
+Ces réglages manuels sont dessinés dans le canvas et sont ceux qui partent dans l’export. Ils ne sont pas lus depuis le fichier FFX.
+
+</div>
 
 </div>
 
 <div class="panel">
 
-<h2>4. Exporter le résultat</h2>
+<h2>4. Exporter</h2>
 
-<div class="status">Le navigateur capture l’image corrigée en temps réel. La capture est demandée à 60 FPS, mais l’iPhone et le navigateur peuvent produire une fréquence plus basse. Le format dépend du navigateur.</div>
+<div class="status">Le navigateur demande une capture à 60 FPS maximum. Cela ne garantit pas un export réel à 60 ou 120 FPS.</div>
 
 <button id="export" disabled>Exporter la vidéo corrigée</button>
 
@@ -208,633 +220,637 @@ a{display:inline-block;color:#ddd4ff;margin-top:12px;overflow-wrap:anywhere}
 
 <div class="panel foot">
 
-<b>Limites actuelles</b><br>
+<b>À savoir</b><br>
 
-Cette version applique luminosité, contraste, saturation, teinte et une simulation de chaleur. Elle ne reproduit pas automatiquement Magic Bullet Looks, Sapphire ou Boris FX. L’export navigateur réencode la vidéo et ne garantit ni les 200 FPS d’origine, ni le débit, ni la qualité identiques au fichier source.
+Le navigateur réencode la vidéo en temps réel. Les FPS, le codec et la qualité dépendent de Safari et de l’iPhone. Le fichier FFX n’est pas automatiquement appliqué.
 
 </div>
 
 </main>
 
-<video id="source" class="source-video" playsinline muted preload="auto"></video>
-
 <script>
 
 'use strict';
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-const video = $('source');
+const video=$('source');
 
-const canvas = $('canvas');
+const canvas=$('canvas');
 
-const ctx = canvas.getContext('2d', {alpha:false});
+const ctx=canvas.getContext('2d',{alpha:false});
 
-let videoURL = null;
+let videoURL=null;
 
-let raf = 0;
+let raf=0;
 
-let recorder = null;
+let recorder=null;
 
-let recordingStream = null;
+let recordingStream=null;
 
-let chunks = [];
+let chunks=[];
 
-let exportTimeout = null;
+let exportTimeout=null;
 
-let exportStartedAt = 0;
+let exportStartedAt=0;
 
-const sliders = ['brightness','contrast','saturation','hue','warmth'];
+let downloadURL=null;
 
-function values() {
+const sliders=['brightness','contrast','saturation','hue','warmth'];
 
-  return {
+function values(){
 
-    brightness: +$('brightness').value,
+return {
 
-    contrast: +$('contrast').value,
+brightness:+$('brightness').value,
 
-    saturation: +$('saturation').value,
+contrast:+$('contrast').value,
 
-    hue: +$('hue').value,
+saturation:+$('saturation').value,
 
-    warmth: +$('warmth').value
+hue:+$('hue').value,
 
-  };
+warmth:+$('warmth').value
 
-}
-
-function updateLabels() {
-
-  for (const id of sliders) {
-
-    const v = +$(id).value;
-
-    $(id + 'Out').textContent =
-
-      id === 'hue' ? v + '°' :
-
-      id === 'warmth' ? (v > 0 ? '+' : '') + v :
-
-      v + '%';
-
-  }
-
-  drawFrame();
+};
 
 }
 
-function drawFrame() {
+function updateLabels(){
 
-  if (!video.videoWidth || !video.videoHeight) return;
+for(const id of sliders){
 
-  const w = video.videoWidth;
+const v=+$(id).value;
 
-  const h = video.videoHeight;
+$(id+'Out').textContent=
 
-  const scale = Math.min(1, 1920/w, 1080/h);
+id==='hue'?v+'°':
 
-  const cw = Math.max(2, Math.round(w*scale));
+id==='warmth'?(v>0?'+':'')+v:
 
-  const ch = Math.max(2, Math.round(h*scale));
-
-  if (canvas.width !== cw || canvas.height !== ch) {
-
-    canvas.width = cw;
-
-    canvas.height = ch;
-
-  }
-
-  const v = values();
-
-  ctx.save();
-
-  ctx.filter = `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturation}%) hue-rotate(${v.hue}deg)`;
-
-  ctx.drawImage(video, 0, 0, cw, ch);
-
-  ctx.restore();
-
-  if (v.warmth !== 0) {
-
-    const alpha = Math.min(.22, Math.abs(v.warmth)/220);
-
-    ctx.save();
-
-    ctx.globalCompositeOperation = 'soft-light';
-
-    ctx.fillStyle = v.warmth > 0
-
-      ? `rgba(255,140,50,${alpha})`
-
-      : `rgba(60,130,255,${alpha})`;
-
-    ctx.fillRect(0, 0, cw, ch);
-
-    ctx.restore();
-
-  }
+v+'%';
 
 }
 
-function loop() {
-
-  drawFrame();
-
-  raf = requestAnimationFrame(loop);
+drawFrame();
 
 }
 
-function stopLoop() {
+function drawFrame(){
 
-  if (raf) cancelAnimationFrame(raf);
+if(!video.videoWidth||!video.videoHeight)return;
 
-  raf = 0;
+const w=video.videoWidth;
+
+const h=video.videoHeight;
+
+const scale=Math.min(1,1920/w,1080/h);
+
+const cw=Math.max(2,Math.round(w*scale));
+
+const ch=Math.max(2,Math.round(h*scale));
+
+if(canvas.width!==cw||canvas.height!==ch){
+
+canvas.width=cw;
+
+canvas.height=ch;
 
 }
 
-$('videoFile').addEventListener('change', e => {
+const v=values();
 
-  const f = e.target.files && e.target.files[0];
+ctx.save();
 
-  if (!f) return;
+ctx.filter=`brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturation}%) hue-rotate(${v.hue}deg)`;
 
-  stopLoop();
+ctx.drawImage(video,0,0,cw,ch);
 
-  if (videoURL) URL.revokeObjectURL(videoURL);
+ctx.restore();
 
-  videoURL = URL.createObjectURL(f);
+if(v.warmth!==0){
 
-  $('export').disabled = true;
+const alpha=Math.min(.22,Math.abs(v.warmth)/220);
 
-  $('download').classList.add('hidden');
+ctx.save();
 
-  $('exportStatus').textContent = '';
+ctx.globalCompositeOperation='soft-light';
 
-  $('videoStatus').textContent =
+ctx.fillStyle=v.warmth>0
 
-    `Fichier sélectionné : ${f.name} · ${(f.size/1048576).toFixed(1)} Mo. Chargement…`;
+?`rgba(255,140,50,${alpha})`
 
-  video.onerror = () => {
+:`rgba(60,130,255,${alpha})`;
 
-    $('videoStatus').textContent =
+ctx.fillRect(0,0,cw,ch);
 
-      'Impossible de lire cette vidéo dans ce navigateur. Essaie un MP4 H.264.';
+ctx.restore();
 
-    $('empty').classList.remove('hidden');
+}
 
-  };
+$('empty').classList.add('hidden');
 
-  video.onloadedmetadata = () => {
+}
 
-    if (!video.videoWidth) {
+function loop(){
 
-      $('videoStatus').textContent =
+drawFrame();
 
-        'La vidéo est détectée, mais son format ne peut pas être décodé.';
+raf=requestAnimationFrame(loop);
 
-      return;
+}
 
-    }
+function startLoop(){
 
-    $('empty').classList.add('hidden');
+if(!raf)raf=requestAnimationFrame(loop);
 
-    $('export').disabled = false;
+}
 
-    $('videoStatus').textContent =
+function stopLoop(){
 
-      `Vidéo prête : ${f.name} · ${video.videoWidth} × ${video.videoHeight} · ${Number.isFinite(video.duration) ? video.duration.toFixed(1)+' s' : 'durée inconnue'}.`;
+if(raf)cancelAnimationFrame(raf);
 
-    drawFrame();
+raf=0;
 
-    video.currentTime = 0;
+}
 
-    video.play().then(() => {
+video.addEventListener('loadedmetadata',()=>{
 
-      stopLoop();
+if(!video.videoWidth){
 
-      loop();
+$('videoStatus').textContent='La vidéo ne peut pas être décodée. Essaie un MP4 H.264.';
 
-    }).catch(() => {
+return;
 
-      $('videoStatus').textContent +=
+}
 
-        ' Appuie sur lecture ou relance la vidéo si l’aperçu reste figé.';
+canvas.width=Math.min(video.videoWidth,1920);
 
-    });
+canvas.height=Math.max(2,Math.round(canvas.width*video.videoHeight/video.videoWidth));
 
-  };
+drawFrame();
 
-  video.src = videoURL;
+$('export').disabled=false;
 
-  video.load();
+$('previewPlay').disabled=false;
+
+$('previewPause').disabled=false;
+
+$('videoStatus').textContent=
+
+`Vidéo prête : ${video.videoWidth} × ${video.videoHeight} · ${Number.isFinite(video.duration)?video.duration.toFixed(1)+' s':'durée inconnue'}. Appuie sur Lecture pour actualiser l’aperçu.`;
 
 });
 
-$('presetFile').addEventListener('change', async e => {
+video.addEventListener('loadeddata',drawFrame);
 
-  const f = e.target.files && e.target.files[0];
+video.addEventListener('seeked',drawFrame);
 
-  if (!f) return;
+video.addEventListener('timeupdate',drawFrame);
 
-  $('effects').innerHTML = '';
+video.addEventListener('play',startLoop);
 
-  $('presetStatus').textContent =
+video.addEventListener('pause',()=>{drawFrame()});
 
-    `Fichier chargé : ${f.name} · ${(f.size/1024).toFixed(0)} Ko. Analyse des chaînes lisibles…`;
+video.addEventListener('ended',()=>{
 
-  try {
+drawFrame();
 
-    const bytes = new Uint8Array(await f.arrayBuffer());
-
-    let s = '';
-
-    for (const b of bytes) {
-
-      s += (b >= 32 && b <= 126) ? String.fromCharCode(b) : ' ';
-
-    }
-
-    const names = [
-
-      'Magic Bullet Looks',
-
-      'Hue/Saturation',
-
-      'S_Sharpen',
-
-      'Unsharp Mask',
-
-      'BCC Unsharp Mask',
-
-      'Sapphire',
-
-      'Boris FX'
-
-    ];
-
-    const found = names.filter(n =>
-
-      s.toLowerCase().includes(n.toLowerCase())
-
-    );
-
-    if (found.length) {
-
-      $('effects').innerHTML = found
-
-        .map(n => `<span class="effect">${n}</span>`)
-
-        .join('');
-
-      $('presetStatus').innerHTML =
-
-        `<span class="good">${found.length} nom(s) d’effet repéré(s).</span> Les paramètres ne sont pas décodés et aucun effet FFX n’est appliqué automatiquement.`;
-
-    } else {
-
-      $('presetStatus').textContent =
-
-        'Aucun nom connu repéré en texte lisible. Le preset peut stocker ses informations en binaire.';
-
-    }
-
-  } catch (err) {
-
-    $('presetStatus').textContent =
-
-      'Impossible de lire ce fichier dans le navigateur.';
-
-  }
+stopLoop();
 
 });
 
-sliders.forEach(id =>
+video.addEventListener('error',()=>{
 
-  $(id).addEventListener('input', updateLabels)
-
-);
-
-$('reset').addEventListener('click', () => {
-
-  const defaults = {
-
-    brightness:100,
-
-    contrast:100,
-
-    saturation:100,
-
-    hue:0,
-
-    warmth:0
-
-  };
-
-  for (const id of sliders) {
-
-    $(id).value = defaults[id];
-
-  }
-
-  updateLabels();
+$('videoStatus').textContent='Impossible de lire cette vidéo. Essaie un fichier MP4 H.264.';
 
 });
 
-function cleanup() {
+$('videoFile').addEventListener('change',e=>{
 
-  if (exportTimeout) {
+const f=e.target.files&&e.target.files[0];
 
-    clearTimeout(exportTimeout);
+if(!f)return;
 
-    exportTimeout = null;
+stopLoop();
 
-  }
+if(videoURL)URL.revokeObjectURL(videoURL);
 
-  if (recordingStream) {
+videoURL=URL.createObjectURL(f);
 
-    recordingStream.getTracks().forEach(t => t.stop());
+video.pause();
 
-    recordingStream = null;
+video.src=videoURL;
 
-  }
+video.load();
 
-  $('export').disabled = !video.videoWidth;
+$('export').disabled=true;
 
-  $('stopExport').disabled = true;
+$('download').classList.add('hidden');
+
+$('empty').classList.remove('hidden');
+
+$('videoStatus').textContent=
+
+`Chargement : ${f.name} · ${(f.size/1048576).toFixed(1)} Mo`;
+
+});
+
+$('previewPlay').addEventListener('click',async()=>{
+
+try{
+
+await video.play();
+
+startLoop();
+
+drawFrame();
+
+$('videoStatus').textContent='Lecture en cours : l’aperçu corrigé doit suivre la vidéo.';
+
+}catch(e){
+
+$('videoStatus').textContent='Lecture bloquée. Appuie directement sur Lecture dans le lecteur vidéo ci-dessus.';
 
 }
 
-function finishExport() {
+});
 
-  if (recorder && recorder.state !== 'inactive') {
+$('previewPause').addEventListener('click',()=>{
 
-    try {
+video.pause();
 
-      recorder.stop();
+drawFrame();
 
-    } catch (e) {
+});
 
-      cleanup();
+$('presetFile').addEventListener('change',async e=>{
 
-    }
+const f=e.target.files&&e.target.files[0];
 
-  }
+if(!f)return;
+
+$('effects').innerHTML='';
+
+$('presetStatus').textContent=`Fichier chargé : ${f.name}. Recherche de noms lisibles…`;
+
+try{
+
+const bytes=new Uint8Array(await f.arrayBuffer());
+
+let s='';
+
+for(const b of bytes){
+
+s+=(b>=32&&b<=126)?String.fromCharCode(b):' ';
 
 }
 
-$('stopExport').addEventListener('click', finishExport);
+const names=[
 
-$('export').addEventListener('click', async () => {
+'Magic Bullet Looks',
 
-  if (!video.videoWidth) {
+'Hue/Saturation',
 
-    $('exportStatus').textContent = 'Importe d’abord une vidéo lisible.';
+'S_Sharpen',
 
-    return;
+'Unsharp Mask',
 
-  }
+'BCC Unsharp Mask',
 
-  if (!canvas.captureStream || !window.MediaRecorder) {
+'Sapphire',
 
-    $('exportStatus').textContent =
+'Boris FX'
 
-      'Ce navigateur ne prend pas en charge l’export canvas. Essaie Safari récent.';
+];
 
-    return;
+const found=names.filter(n=>s.toLowerCase().includes(n.toLowerCase()));
 
-  }
+if(found.length){
 
-  if (!Number.isFinite(video.duration) || video.duration <= 0) {
+$('effects').innerHTML=found.map(n=>`<span class="effect">${n}</span>`).join('');
 
-    $('exportStatus').textContent = 'Durée de vidéo indisponible.';
+$('presetStatus').textContent='Noms repérés : '+found.join(', ')+'. Les paramètres du FFX ne sont pas appliqués automatiquement.';
 
-    return;
+}else{
 
-  }
+$('presetStatus').textContent='Aucun nom connu lisible. Ce prototype ne sait pas décoder les paramètres binaires du FFX.';
 
-  if (video.duration > 600) {
+}
 
-    $('exportStatus').textContent =
+}catch(e){
 
-      'Cette version limite l’export à 10 minutes pour réduire les risques de blocage sur iPhone.';
+$('presetStatus').textContent='Impossible de lire ce fichier.';
 
-    return;
+}
 
-  }
+});
 
-  let mime = '';
+sliders.forEach(id=>{
 
-  for (const type of [
+$(id).addEventListener('input',()=>{
 
-    'video/mp4;codecs=avc1.42E01E',
+updateLabels();
 
-    'video/mp4',
+if(video.videoWidth)drawFrame();
 
-    'video/webm;codecs=vp9',
+});
 
-    'video/webm;codecs=vp8',
+});
 
-    'video/webm'
+$('reset').addEventListener('click',()=>{
 
-  ]) {
+const d={
 
-    try {
+brightness:100,
 
-      if (MediaRecorder.isTypeSupported(type)) {
+contrast:100,
 
-        mime = type;
+saturation:100,
 
-        break;
+hue:0,
 
-      }
+warmth:0
 
-    } catch (e) {}
+};
 
-  }
+for(const id of sliders)$(id).value=d[id];
 
-  if (!mime) {
+updateLabels();
 
-    $('exportStatus').textContent =
+});
 
-      'Aucun format MediaRecorder compatible détecté.';
+function cleanup(){
 
-    return;
+if(exportTimeout){
 
-  }
+clearTimeout(exportTimeout);
 
-  chunks = [];
+exportTimeout=null;
 
-  $('download').classList.add('hidden');
+}
 
-  $('export').disabled = true;
+if(recordingStream){
 
-  $('stopExport').disabled = false;
+recordingStream.getTracks().forEach(t=>t.stop());
 
-  $('exportStatus').textContent =
+recordingStream=null;
 
-    'Préparation de l’export… garde Safari ouvert au premier plan.';
+}
 
-  try {
+$('export').disabled=!video.videoWidth;
 
-    recordingStream = canvas.captureStream(60);
+$('stopExport').disabled=true;
 
-    recorder = new MediaRecorder(recordingStream, {mimeType:mime});
+}
 
-    recorder.ondataavailable = ev => {
+function finishExport(){
 
-      if (ev.data && ev.data.size) chunks.push(ev.data);
+if(recorder&&recorder.state!=='inactive'){
 
-    };
+try{
 
-    recorder.onerror = () => {
+recorder.stop();
 
-      $('exportStatus').textContent =
+}catch(e){
 
-        'Erreur pendant l’enregistrement. Essaie un clip plus court.';
+cleanup();
 
-      cleanup();
+}
 
-    };
+}
 
-    recorder.onstop = () => {
+}
 
-      const blob = new Blob(chunks, {type:mime});
+$('stopExport').addEventListener('click',finishExport);
 
-      const url = URL.createObjectURL(blob);
+$('export').addEventListener('click',async()=>{
 
-      const a = $('download');
+if(!video.videoWidth){
 
-      const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+$('exportStatus').textContent='Importe une vidéo lisible.';
 
-      a.href = url;
+return;
 
-      a.download = 'colorpreset-export.' + ext;
+}
 
-      a.textContent =
+if(!canvas.captureStream||!window.MediaRecorder){
 
-        `Télécharger la vidéo (${(blob.size/1048576).toFixed(1)} Mo)`;
+$('exportStatus').textContent='Ce navigateur ne prend pas en charge l’export canvas.';
 
-      a.classList.remove('hidden');
+return;
 
-      $('exportStatus').textContent =
+}
 
-        `Export terminé (${(blob.size/1048576).toFixed(1)} Mo). Vérifie la fréquence d’images : elle dépend du navigateur.`;
+if(!Number.isFinite(video.duration)||video.duration<=0){
 
-      cleanup();
+$('exportStatus').textContent='Durée indisponible.';
 
-      video.pause();
+return;
 
-    };
+}
 
-    video.pause();
+if(video.duration>600){
 
-    video.currentTime = 0;
+$('exportStatus').textContent='Limite de cette version : 10 minutes.';
 
-    await new Promise((resolve, reject) => {
+return;
 
-      let done = false;
+}
 
-      const timeout = setTimeout(() => {
+let mime='';
 
-        if (!done) reject(new Error('La vidéo n’a pas pu revenir au début.'));
+for(const t of [
 
-      }, 8000);
+'video/mp4;codecs=avc1.42E01E',
 
-      const finish = () => {
+'video/mp4',
 
-        if (done) return;
+'video/webm;codecs=vp9',
 
-        done = true;
+'video/webm;codecs=vp8',
 
-        clearTimeout(timeout);
+'video/webm'
 
-        video.removeEventListener('seeked', finish);
+]){
 
-        resolve();
+try{
 
-      };
+if(MediaRecorder.isTypeSupported(t)){
 
-      video.addEventListener('seeked', finish, {once:true});
+mime=t;
 
-      if (video.currentTime === 0) finish();
+break;
 
-    });
+}
 
-    drawFrame();
+}catch(e){}
 
-    await video.play();
+}
 
-    recorder.start(1000);
+if(!mime){
 
-    exportStartedAt = performance.now();
+$('exportStatus').textContent='Aucun format compatible détecté.';
 
-    $('exportStatus').textContent =
+return;
 
-      `Export en cours : 0 / ${video.duration.toFixed(1)} s. Ne quitte pas Safari.`;
+}
 
-    const tick = () => {
+chunks=[];
 
-      if (!recorder || recorder.state !== 'recording') return;
+$('download').classList.add('hidden');
 
-      const elapsed = Math.min(
+$('export').disabled=true;
 
-        (performance.now() - exportStartedAt)/1000,
+$('stopExport').disabled=false;
 
-        video.duration
+$('exportStatus').textContent='Préparation… garde cette page ouverte au premier plan.';
 
-      );
+try{
 
-      $('exportStatus').textContent =
+video.pause();
 
-        `Export en cours : ${elapsed.toFixed(1)} / ${video.duration.toFixed(1)} s.`;
+video.currentTime=0;
 
-      if (
+await new Promise((resolve,reject)=>{
 
-        video.ended ||
+if(video.readyState>=2&&video.currentTime===0){
 
-        elapsed >= video.duration ||
+resolve();
 
-        video.currentTime >= video.duration - .08
+return;
 
-      ) {
+}
 
-        finishExport();
+let done=false;
 
-        return;
+const timeout=setTimeout(()=>{
 
-      }
+if(!done){
 
-      exportTimeout = setTimeout(tick, 250);
+done=true;
 
-    };
+reject(new Error('Impossible de revenir au début'));
 
-    exportTimeout = setTimeout(tick, 250);
+}
 
-  } catch (err) {
+},8000);
 
-    $('exportStatus').textContent =
+const onSeek=()=>{
 
-      'L’export a échoué : ' +
+if(done)return;
 
-      (err && err.message ? err.message : 'erreur inconnue') +
+done=true;
 
-      '. Essaie un clip plus court.';
+clearTimeout(timeout);
 
-    if (recorder && recorder.state === 'recording') {
+video.removeEventListener('seeked',onSeek);
 
-      try {
+resolve();
 
-        recorder.stop();
+};
 
-      } catch (e) {}
+video.addEventListener('seeked',onSeek);
 
-    }
+});
 
-    cleanup();
+drawFrame();
 
-  }
+recordingStream=canvas.captureStream(60);
+
+recorder=new MediaRecorder(recordingStream,{mimeType:mime});
+
+recorder.ondataavailable=e=>{
+
+if(e.data&&e.data.size)chunks.push(e.data);
+
+};
+
+recorder.onerror=()=>{
+
+$('exportStatus').textContent='Erreur pendant l’export. Essaie une vidéo plus courte.';
+
+cleanup();
+
+};
+
+recorder.onstop=()=>{
+
+const blob=new Blob(chunks,{type:mime});
+
+if(downloadURL)URL.revokeObjectURL(downloadURL);
+
+downloadURL=URL.createObjectURL(blob);
+
+const a=$('download');
+
+const ext=mime.includes('mp4')?'mp4':'webm';
+
+a.href=downloadURL;
+
+a.download='colorpreset-export.'+ext;
+
+a.textContent=`Télécharger la vidéo corrigée (${(blob.size/1048576).toFixed(1)} Mo)`;
+
+a.classList.remove('hidden');
+
+$('exportStatus').textContent='Export terminé. Les corrections dessinées dans l’aperçu ont été enregistrées. La fréquence d’images réelle n’est pas garantie.';
+
+cleanup();
+
+video.pause();
+
+drawFrame();
+
+};
+
+await video.play();
+
+startLoop();
+
+drawFrame();
+
+recorder.start(1000);
+
+exportStartedAt=performance.now();
+
+const tick=()=>{
+
+if(!recorder||recorder.state!=='recording')return;
+
+const elapsed=(performance.now()-exportStartedAt)/1000;
+
+$('exportStatus').textContent=
+
+`Export en cours : ${Math.min(elapsed,video.duration).toFixed(1)} / ${video.duration.toFixed(1)} s`;
+
+if(video.ended||video.currentTime>=video.duration-.08||elapsed>=video.duration){
+
+finishExport();
+
+return;
+
+}
+
+exportTimeout=setTimeout(tick,200);
+
+};
+
+exportTimeout=setTimeout(tick,200);
+
+}catch(err){
+
+$('exportStatus').textContent='Export impossible : '+(err&&err.message?err.message:'erreur inconnue')+'. Essaie un MP4 H.264 plus court.';
+
+if(recorder&&recorder.state==='recording'){
+
+try{recorder.stop()}catch(e){}
+
+}
+
+cleanup();
+
+}
 
 });
 
