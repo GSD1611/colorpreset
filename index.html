@@ -1,3 +1,5 @@
+
+
 <!doctype html>
 
 <html lang="fr">
@@ -10,323 +12,69 @@
 
 <meta name="theme-color" content="#101015">
 
-<title>ColorPreset v0.7</title>
+<title>ColorPreset v0.8</title>
 
 <style>
 
-:root {
+:root{color-scheme:dark;--bg:#101015;--panel:#1b1b24;--line:#30303c;--text:#f4f2fa;--muted:#aaa8bb;--accent:#b8a1ff}
 
-  color-scheme: dark;
+*{box-sizing:border-box}
 
-  --bg: #101015;
+body{margin:0;background:var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 
-  --panel: #1b1b24;
+main{max-width:760px;margin:auto;padding:18px 14px 40px}
 
-  --line: #30303c;
+.brand{display:flex;gap:12px;align-items:center;margin:4px 0 18px}
 
-  --text: #f4f2fa;
+.logo{width:46px;height:46px;border-radius:14px;background:#30264a;display:grid;place-items:center;font-size:24px}
 
-  --muted: #aaa8bb;
+.sub{color:var(--muted);font-size:13px}
 
-  --accent: #b8a1ff;
+h1{font-size:22px;margin:0}
 
-}
+h2{font-size:16px;margin:0 0 12px}
 
-* { box-sizing: border-box; }
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin:12px 0}
 
-body {
+.file{display:block;width:100%;margin-top:8px;padding:12px;background:#111118;border:1px dashed #5b536f;border-radius:12px;color:var(--text)}
 
-  margin: 0;
+.preview{width:100%;aspect-ratio:16/9;background:#09090d;border-radius:12px;overflow:hidden;display:grid;place-items:center;margin-top:12px;position:relative}
 
-  background: var(--bg);
+.preview canvas{display:block;width:100%;height:100%;object-fit:contain}
 
-  color: var(--text);
+.empty{text-align:center;color:var(--muted);padding:22px;position:absolute;pointer-events:none}
 
-  font: 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+.status{font-size:13px;color:var(--muted);line-height:1.5;margin-top:9px;overflow-wrap:anywhere}
 
-}
+.control{margin:15px 0}
 
-main {
+.control label{display:flex;justify-content:space-between;margin-bottom:8px}
 
-  max-width: 760px;
+.control output{color:var(--accent);font-variant-numeric:tabular-nums}
 
-  margin: auto;
+input[type=range]{width:100%;accent-color:var(--accent)}
 
-  padding: 18px 14px 40px;
+button{border:0;border-radius:12px;background:var(--accent);color:#171222;font-weight:700;padding:13px 15px;width:100%;font-size:15px;margin-top:8px}
 
-}
+button.secondary{background:#302b3d;color:#f4f2fa}
 
-.brand {
+button:disabled{opacity:.45}
 
-  display: flex;
+.pill{display:inline-block;background:#302b3d;border-radius:20px;padding:5px 9px;font-size:12px;color:#ddd4ff}
 
-  gap: 12px;
+.effects{display:flex;flex-wrap:wrap;gap:6px}
 
-  align-items: center;
+.effect{background:#252331;border:1px solid #49435d;border-radius:8px;padding:7px 9px;font-size:12px}
 
-  margin: 4px 0 18px;
+.foot{font-size:12px;color:var(--muted);line-height:1.5}
 
-}
+.hidden{display:none}
 
-.logo {
+video.source-video{display:block;width:100%;max-height:240px;background:#08080c;border-radius:12px;margin-top:12px}
 
-  width: 46px;
+a{display:inline-block;color:#ddd4ff;margin-top:12px;overflow-wrap:anywhere}
 
-  height: 46px;
-
-  border-radius: 14px;
-
-  background: #30264a;
-
-  display: grid;
-
-  place-items: center;
-
-  font-size: 24px;
-
-}
-
-.sub { color: var(--muted); font-size: 13px; }
-
-h1 { font-size: 22px; margin: 0; }
-
-h2 { font-size: 16px; margin: 0 0 12px; }
-
-.panel {
-
-  background: var(--panel);
-
-  border: 1px solid var(--line);
-
-  border-radius: 18px;
-
-  padding: 15px;
-
-  margin: 12px 0;
-
-}
-
-.file {
-
-  display: block;
-
-  width: 100%;
-
-  margin-top: 8px;
-
-  padding: 12px;
-
-  background: #111118;
-
-  border: 1px dashed #5b536f;
-
-  border-radius: 12px;
-
-  color: var(--text);
-
-}
-
-.preview {
-
-  width: 100%;
-
-  aspect-ratio: 16 / 9;
-
-  background: #09090d;
-
-  border-radius: 12px;
-
-  overflow: hidden;
-
-  display: grid;
-
-  place-items: center;
-
-  margin-top: 12px;
-
-  position: relative;
-
-}
-
-.preview canvas {
-
-  display: block;
-
-  width: 100%;
-
-  height: 100%;
-
-  object-fit: contain;
-
-}
-
-.empty {
-
-  text-align: center;
-
-  color: var(--muted);
-
-  padding: 22px;
-
-  position: absolute;
-
-  pointer-events: none;
-
-}
-
-.status {
-
-  font-size: 13px;
-
-  color: var(--muted);
-
-  line-height: 1.5;
-
-  margin-top: 9px;
-
-  overflow-wrap: anywhere;
-
-}
-
-.control { margin: 15px 0; }
-
-.control label {
-
-  display: flex;
-
-  justify-content: space-between;
-
-  margin-bottom: 8px;
-
-}
-
-.control output {
-
-  color: var(--accent);
-
-  font-variant-numeric: tabular-nums;
-
-}
-
-input[type="range"] {
-
-  width: 100%;
-
-  accent-color: var(--accent);
-
-}
-
-button {
-
-  border: 0;
-
-  border-radius: 12px;
-
-  background: var(--accent);
-
-  color: #171222;
-
-  font-weight: 700;
-
-  padding: 13px 15px;
-
-  width: 100%;
-
-  font-size: 15px;
-
-  margin-top: 8px;
-
-}
-
-button.secondary {
-
-  background: #302b3d;
-
-  color: #f4f2fa;
-
-}
-
-button:disabled { opacity: .45; }
-
-.pill {
-
-  display: inline-block;
-
-  background: #302b3d;
-
-  border-radius: 20px;
-
-  padding: 5px 9px;
-
-  font-size: 12px;
-
-  color: #ddd4ff;
-
-}
-
-.effects {
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 6px;
-
-}
-
-.effect {
-
-  background: #252331;
-
-  border: 1px solid #49435d;
-
-  border-radius: 8px;
-
-  padding: 7px 9px;
-
-  font-size: 12px;
-
-}
-
-.foot {
-
-  font-size: 12px;
-
-  color: var(--muted);
-
-  line-height: 1.5;
-
-}
-
-.hidden { display: none; }
-
-video.source-video {
-
-  display: block;
-
-  width: 100%;
-
-  max-height: 240px;
-
-  background: #08080c;
-
-  border-radius: 12px;
-
-  margin-top: 12px;
-
-}
-
-a {
-
-  display: inline-block;
-
-  color: #ddd4ff;
-
-  margin-top: 12px;
-
-  overflow-wrap: anywhere;
-
-}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 
 </style>
 
@@ -336,171 +84,81 @@ a {
 
 <main>
 
-<div class="brand">
+<div class="brand"><div class="logo">✦</div><div><h1>ColorPreset</h1><div class="sub">Prototype 0.8 · correction par pixels</div></div></div>
 
-  <div class="logo">✦</div>
+<div class="panel">
 
-  <div>
+<h2>1. Importer ton edit</h2>
 
-    <h1>ColorPreset</h1>
+<div class="sub">Choisis une vidéo depuis Fichiers ou ta galerie.</div>
 
-    <div class="sub">Prototype 0.7 · color correction améliorée</div>
+<input class="file" id="videoFile" type="file" accept="video/*">
 
-  </div>
+<video id="source" class="source-video" playsinline webkit-playsinline muted controls preload="metadata"></video>
+
+<div class="sub">Lecteur vidéo original.</div>
+
+<div class="preview"><canvas id="canvas" width="640" height="360"></canvas><div class="empty" id="empty">Importe une vidéo pour voir l’aperçu corrigé.</div></div>
+
+<div class="status" id="videoStatus">Aucune vidéo sélectionnée.</div>
+
+<button id="previewPlay" disabled>Lire l’aperçu corrigé</button>
+
+<button class="secondary" id="previewPause" disabled>Mettre en pause</button>
 
 </div>
 
 <div class="panel">
 
-  <h2>1. Importer ton edit</h2>
+<h2>2. Importer ton preset After Effects</h2>
 
-  <div class="sub">Choisis une vidéo depuis Fichiers ou ta galerie.</div>
+<div class="sub">Cette version repère quelques noms lisibles dans un FFX, mais ne peut pas appliquer ses paramètres automatiquement.</div>
 
-  <input class="file" id="videoFile" type="file" accept="video/*">
+<input class="file" id="presetFile" type="file" accept=".ffx,application/octet-stream">
 
-  <video id="source" class="source-video"
+<div class="status" id="presetStatus">Aucun preset sélectionné.</div>
 
-    playsinline webkit-playsinline muted controls preload="metadata"></video>
-
-  <div class="sub">Lecteur vidéo original.</div>
-
-  <div class="preview">
-
-    <canvas id="canvas" width="960" height="540"></canvas>
-
-    <div class="empty" id="empty">
-
-      Importe une vidéo, puis appuie sur Lecture.
-
-    </div>
-
-  </div>
-
-  <div class="status" id="videoStatus">Aucune vidéo sélectionnée.</div>
-
-  <button id="previewPlay" disabled>Lire l’aperçu corrigé</button>
-
-  <button class="secondary" id="previewPause" disabled>Mettre en pause</button>
+<div class="effects" id="effects"></div>
 
 </div>
 
 <div class="panel">
 
-  <h2>2. Importer ton preset After Effects</h2>
+<div class="row"><h2>3. Régler la color correction</h2><span class="pill">Aperçu en direct</span></div>
 
-  <div class="sub">
+<div class="control"><label for="brightness">Luminosité <output id="brightnessOut">100%</output></label><input id="brightness" type="range" min="50" max="160" value="100"></div>
 
-    Cette version peut repérer quelques noms lisibles dans un FFX,
+<div class="control"><label for="contrast">Contraste <output id="contrastOut">100%</output></label><input id="contrast" type="range" min="50" max="180" value="100"></div>
 
-    mais ne peut pas appliquer automatiquement ses paramètres.
+<div class="control"><label for="saturation">Saturation <output id="saturationOut">100%</output></label><input id="saturation" type="range" min="0" max="200" value="100"></div>
 
-  </div>
+<div class="control"><label for="hue">Teinte <output id="hueOut">0°</output></label><input id="hue" type="range" min="-180" max="180" value="0"></div>
 
-  <input class="file" id="presetFile" type="file" accept=".ffx,application/octet-stream">
+<div class="control"><label for="warmth">Chaleur <output id="warmthOut">0</output></label><input id="warmth" type="range" min="-40" max="40" value="0"></div>
 
-  <div class="status" id="presetStatus">Aucun preset sélectionné.</div>
+<button class="secondary" id="reset">Réinitialiser les réglages</button>
 
-  <div class="effects" id="effects"></div>
-
-</div>
-
-<div class="panel">
-
-  <div class="row">
-
-    <h2>3. Régler la color correction</h2>
-
-    <span class="pill">Aperçu en direct</span>
-
-  </div>
-
-  <div class="control">
-
-    <label for="brightness">Luminosité <output id="brightnessOut">100%</output></label>
-
-    <input id="brightness" type="range" min="50" max="160" value="100">
-
-  </div>
-
-  <div class="control">
-
-    <label for="contrast">Contraste <output id="contrastOut">100%</output></label>
-
-    <input id="contrast" type="range" min="50" max="180" value="100">
-
-  </div>
-
-  <div class="control">
-
-    <label for="saturation">Saturation <output id="saturationOut">100%</output></label>
-
-    <input id="saturation" type="range" min="0" max="200" value="100">
-
-  </div>
-
-  <div class="control">
-
-    <label for="hue">Teinte <output id="hueOut">0°</output></label>
-
-    <input id="hue" type="range" min="-180" max="180" value="0">
-
-  </div>
-
-  <div class="control">
-
-    <label for="warmth">Chaleur <output id="warmthOut">0</output></label>
-
-    <input id="warmth" type="range" min="-40" max="40" value="0">
-
-  </div>
-
-  <button class="secondary" id="reset">Réinitialiser les réglages</button>
-
-  <div class="status">
-
-    Les réglages manuels sont appliqués au canvas utilisé pour l’aperçu
-
-    et l’export. Le preset FFX n’est pas automatiquement décodé.
-
-  </div>
+<div class="status">Les corrections sont calculées directement sur les pixels du canvas. Sur iPhone, le traitement peut ralentir avec les vidéos très grandes.</div>
 
 </div>
 
 <div class="panel">
 
-  <h2>4. Exporter</h2>
+<h2>4. Exporter</h2>
 
-  <div class="status">
+<div class="status">L’export capture le canvas corrigé. Safari peut limiter les FPS réels à 30 ou moins ; 60, 120 ou 200 FPS ne sont pas garantis.</div>
 
-    L’export utilise la capture du canvas. Safari peut toutefois limiter
+<button id="export" disabled>Exporter la vidéo corrigée</button>
 
-    la fréquence d’images réelle, notamment à 30 FPS.
+<button class="secondary" id="stopExport" disabled>Arrêter l’export</button>
 
-  </div>
+<div class="status" id="exportStatus"></div>
 
-  <button id="export" disabled>Exporter la vidéo corrigée</button>
-
-  <button class="secondary" id="stopExport" disabled>Arrêter l’export</button>
-
-  <div class="status" id="exportStatus"></div>
-
-  <a id="download" class="hidden" download="colorpreset-export.webm">
-
-    Télécharger la vidéo exportée
-
-  </a>
+<a id="download" class="hidden" download="colorpreset-export.webm">Télécharger la vidéo exportée</a>
 
 </div>
 
-<div class="panel foot">
-
-  <b>À savoir</b><br>
-
-  Un export à 60 FPS maximum est demandé, mais ce n’est pas garanti.
-
-  Cette version ne garantit pas un export à 120 ou 200 FPS.
-
-</div>
+<div class="panel foot"><b>Limites</b><br>Le preset FFX n’est pas décodé. Cette application ne garantit pas la fréquence d’images source lors de l’export.</div>
 
 </main>
 
@@ -508,761 +166,511 @@ a {
 
 'use strict';
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-const video = $('source');
+const video=$('source');
 
-const canvas = $('canvas');
+const canvas=$('canvas');
 
-const ctx = canvas.getContext('2d', { alpha: false });
+const ctx=canvas.getContext('2d',{willReadFrequently:true});
 
-let videoURL = null;
+let videoURL=null,raf=0,recorder=null,recordingStream=null;
 
-let raf = 0;
+let chunks=[],exportTimeout=null,downloadURL=null,lastProcess=0,processing=false;
 
-let recorder = null;
+const sliders=['brightness','contrast','saturation','hue','warmth'];
 
-let recordingStream = null;
+function values(){
 
-let chunks = [];
+ return {
 
-let exportTimeout = null;
+  brightness:+$('brightness').value,
 
-let exportStartedAt = 0;
+  contrast:+$('contrast').value,
 
-let downloadURL = null;
+  saturation:+$('saturation').value,
 
-const sliders = [
+  hue:+$('hue').value,
 
-  'brightness',
+  warmth:+$('warmth').value
 
-  'contrast',
-
-  'saturation',
-
-  'hue',
-
-  'warmth'
-
-];
-
-function values() {
-
-  return {
-
-    brightness: Number($('brightness').value),
-
-    contrast: Number($('contrast').value),
-
-    saturation: Number($('saturation').value),
-
-    hue: Number($('hue').value),
-
-    warmth: Number($('warmth').value)
-
-  };
+ };
 
 }
 
-function updateLabels() {
+function updateLabels(){
 
-  for (const id of sliders) {
+ sliders.forEach(id=>{
 
-    const value = Number($(id).value);
+  const n=+$ (id).value;
 
-    if (id === 'hue') {
+  $(id+'Out').textContent=id==='hue'?n+'°':
 
-      $(id + 'Out').textContent = value + '°';
+   id==='warmth'?(n>0?'+':'')+n:n+'%';
 
-    } else if (id === 'warmth') {
+ });
 
-      $(id + 'Out').textContent = (value > 0 ? '+' : '') + value;
-
-    } else {
-
-      $(id + 'Out').textContent = value + '%';
-
-    }
-
-  }
-
-  drawFrame();
+ drawFrame(true);
 
 }
 
-/* Dessine chaque image avec les réglages courants. */
+function clamp(n){return n<0?0:n>255?255:n;}
 
-function drawFrame() {
+function processPixels(image,v){
 
-  if (!video.videoWidth || !video.videoHeight) return;
+ const d=image.data;
 
-  const sourceW = video.videoWidth;
+ const br=v.brightness/100;
 
-  const sourceH = video.videoHeight;
+ const co=v.contrast/100;
 
-  // Limite la taille du canvas pour éviter une consommation excessive
+ const sa=v.saturation/100;
 
-  // de mémoire sur iPhone.
+ const angle=v.hue*Math.PI/180;
 
-  const scale = Math.min(1, 1920 / sourceW, 1080 / sourceH);
+ const cos=Math.cos(angle),sin=Math.sin(angle);
 
-  const w = Math.max(2, Math.round(sourceW * scale));
+ const lumR=.213,lumG=.715,lumB=.072;
 
-  const h = Math.max(2, Math.round(sourceH * scale));
+ const m00=lumR+cos*(1-lumR)+sin*(-lumR);
 
-  if (canvas.width !== w || canvas.height !== h) {
+ const m01=lumG+cos*(-lumG)+sin*(-lumG);
 
-    canvas.width = w;
+ const m02=lumB+cos*(-lumB)+sin*(1-lumB);
 
-    canvas.height = h;
+ const m10=lumR+cos*(-lumR)+sin*.143;
 
-  }
+ const m11=lumG+cos*(1-lumG)+sin*.140;
 
-  const v = values();
+ const m12=lumB+cos*(-lumB)+sin*(-.283);
 
-  ctx.save();
+ const m20=lumR+cos*(-lumR)+sin*-(1-lumR);
 
-  // Applique les effets directement à l'image dessinée dans le canvas.
+ const m21=lumG+cos*(-lumG)+sin*lumG;
 
-  ctx.filter =
+ const m22=lumB+cos*(1-lumB)+sin*lumB;
 
-    'brightness(' + v.brightness + '%) ' +
+ const warm=v.warmth/40;
 
-    'contrast(' + v.contrast + '%) ' +
+ for(let i=0;i<d.length;i+=4){
 
-    'saturate(' + v.saturation + '%) ' +
+  let r=d[i],g=d[i+1],b=d[i+2];
 
-    'hue-rotate(' + v.hue + 'deg)';
+  const y=.299*r+.587*g+.114*b;
 
-  ctx.drawImage(video, 0, 0, w, h);
+  r=y+(r-y)*sa;
 
-  ctx.restore();
+  g=y+(g-y)*sa;
 
-  // Chaleur : teinte chaude ou froide superposée à l'image.
+  b=y+(b-y)*sa;
 
-  if (v.warmth !== 0) {
+  const rr=m00*r+m01*g+m02*b;
 
-    const alpha = Math.min(0.35, Math.abs(v.warmth) / 100);
+  const gg=m10*r+m11*g+m12*b;
 
-    ctx.save();
+  const bb=m20*r+m21*g+m22*b;
 
-    ctx.globalCompositeOperation = 'soft-light';
+  r=((rr-128)*co+128)*br;
 
-    ctx.fillStyle = v.warmth > 0
+  g=((gg-128)*co+128)*br;
 
-      ? 'rgba(255,140,50,' + alpha + ')'
+  b=((bb-128)*co+128)*br;
 
-      : 'rgba(60,130,255,' + alpha + ')';
+  if(warm>0){r+=warm*25;g+=warm*6;b-=warm*18;}
 
-    ctx.fillRect(0, 0, w, h);
+  else if(warm<0){r+=warm*18;g-=warm*4;b-=warm*25;}
 
-    ctx.restore();
+  d[i]=clamp(r);
 
-  }
+  d[i+1]=clamp(g);
+
+  d[i+2]=clamp(b);
+
+ }
+
+ return image;
+
+}
+
+function drawFrame(force=false){
+
+ if(!video.videoWidth||!video.videoHeight||processing)return;
+
+ const now=performance.now();
+
+ if(!force&&!video.paused&&now-lastProcess<80)return;
+
+ lastProcess=now;
+
+ const sw=video.videoWidth,sh=video.videoHeight;
+
+ const scale=Math.min(1,640/sw,360/sh);
+
+ const w=Math.max(2,Math.round(sw*scale));
+
+ const h=Math.max(2,Math.round(sh*scale));
+
+ if(canvas.width!==w||canvas.height!==h){
+
+  canvas.width=w;
+
+  canvas.height=h;
+
+ }
+
+ try{
+
+  processing=true;
+
+  ctx.drawImage(video,0,0,w,h);
+
+  const image=ctx.getImageData(0,0,w,h);
+
+  processPixels(image,values());
+
+  ctx.putImageData(image,0,0);
 
   $('empty').classList.add('hidden');
 
-}
+ }catch(e){
 
-function loop() {
+  $('videoStatus').textContent='Erreur de rendu : '+e.message;
 
-  drawFrame();
+ }finally{
 
-  raf = requestAnimationFrame(loop);
+  processing=false;
 
-}
-
-function startLoop() {
-
-  if (!raf) raf = requestAnimationFrame(loop);
+ }
 
 }
 
-function stopLoop() {
+function loop(){drawFrame();raf=requestAnimationFrame(loop);}
 
-  if (raf) cancelAnimationFrame(raf);
+function startLoop(){if(!raf)raf=requestAnimationFrame(loop);}
 
-  raf = 0;
+function stopLoop(){if(raf)cancelAnimationFrame(raf);raf=0;}
 
-}
+video.addEventListener('loadedmetadata',()=>{
 
-/* Import vidéo */
+ if(!video.videoWidth){
 
-video.addEventListener('loadedmetadata', () => {
+  $('videoStatus').textContent='Vidéo illisible : essaie un MP4 H.264.';
 
-  if (!video.videoWidth || !video.videoHeight) {
+  return;
 
-    $('videoStatus').textContent =
+ }
 
-      'La vidéo ne peut pas être décodée. Essaie un MP4 H.264.';
+ drawFrame(true);
 
-    return;
+ $('export').disabled=false;
+
+ $('previewPlay').disabled=false;
+
+ $('previewPause').disabled=false;
+
+ $('videoStatus').textContent='Vidéo prête : '+video.videoWidth+' × '+video.videoHeight+'.';
+
+});
+
+['loadeddata','seeked','timeupdate'].forEach(e=>
+
+ video.addEventListener(e,()=>drawFrame(true))
+
+);
+
+video.addEventListener('play',startLoop);
+
+video.addEventListener('pause',()=>drawFrame(true));
+
+video.addEventListener('ended',()=>{drawFrame(true);stopLoop();});
+
+video.addEventListener('error',()=>
+
+ $('videoStatus').textContent='Impossible de lire cette vidéo. Essaie un MP4 H.264.'
+
+);
+
+$('videoFile').addEventListener('change',e=>{
+
+ const f=e.target.files&&e.target.files[0];
+
+ if(!f)return;
+
+ stopLoop();
+
+ if(videoURL)URL.revokeObjectURL(videoURL);
+
+ videoURL=URL.createObjectURL(f);
+
+ video.pause();
+
+ video.src=videoURL;
+
+ video.load();
+
+ $('export').disabled=true;
+
+ $('download').classList.add('hidden');
+
+ $('empty').classList.remove('hidden');
+
+ $('videoStatus').textContent='Chargement : '+f.name;
+
+});
+
+$('previewPlay').addEventListener('click',async()=>{
+
+ try{
+
+  await video.play();
+
+  startLoop();
+
+  drawFrame(true);
+
+ }catch(e){
+
+  $('videoStatus').textContent='Appuie sur Lecture dans le lecteur original.';
+
+ }
+
+});
+
+$('previewPause').addEventListener('click',()=>{
+
+ video.pause();
+
+ drawFrame(true);
+
+});
+
+sliders.forEach(id=>$(id).addEventListener('input',()=>updateLabels()));
+
+$('reset').addEventListener('click',()=>{
+
+ const d={brightness:100,contrast:100,saturation:100,hue:0,warmth:0};
+
+ sliders.forEach(id=>$(id).value=d[id]);
+
+ updateLabels();
+
+});
+
+$('presetFile').addEventListener('change',async e=>{
+
+ const f=e.target.files&&e.target.files[0];
+
+ if(!f)return;
+
+ $('effects').innerHTML='';
+
+ $('presetStatus').textContent='Fichier chargé : '+f.name+'. Recherche de noms…';
+
+ try{
+
+  const bytes=new Uint8Array(await f.arrayBuffer());
+
+  let s='';
+
+  for(const b of bytes)s+=(b>=32&&b<=126)?String.fromCharCode(b):' ';
+
+  const names=['Magic Bullet Looks','Hue/Saturation','S_Sharpen','Unsharp Mask','Sapphire','Boris FX'];
+
+  const found=names.filter(n=>s.toLowerCase().includes(n.toLowerCase()));
+
+  if(found.length){
+
+   $('effects').innerHTML=found.map(n=>'<span class="effect">'+n+'</span>').join('');
+
+   $('presetStatus').textContent='Noms repérés, paramètres non appliqués automatiquement.';
+
+  }else{
+
+   $('presetStatus').textContent='Aucun nom connu lisible. Les paramètres binaires FFX ne sont pas décodés.';
 
   }
 
-  drawFrame();
+ }catch(e){
 
-  $('export').disabled = false;
+  $('presetStatus').textContent='Impossible de lire ce fichier.';
 
-  $('previewPlay').disabled = false;
-
-  $('previewPause').disabled = false;
-
-  $('videoStatus').textContent =
-
-    'Vidéo prête : ' + video.videoWidth + ' × ' + video.videoHeight +
-
-    ' · ' + (Number.isFinite(video.duration)
-
-      ? video.duration.toFixed(1) + ' s'
-
-      : 'durée inconnue') +
-
-    '. Appuie sur Lecture pour lancer l’aperçu.';
+ }
 
 });
 
-video.addEventListener('loadeddata', drawFrame);
+function cleanup(){
 
-video.addEventListener('seeked', drawFrame);
+ if(exportTimeout){clearTimeout(exportTimeout);exportTimeout=null;}
 
-video.addEventListener('timeupdate', drawFrame);
+ if(recordingStream){
 
-video.addEventListener('play', startLoop);
+  recordingStream.getTracks().forEach(t=>t.stop());
 
-video.addEventListener('pause', () => {
+  recordingStream=null;
 
-  drawFrame();
+ }
 
-});
+ $('export').disabled=!video.videoWidth;
 
-video.addEventListener('ended', () => {
+ $('stopExport').disabled=true;
 
-  drawFrame();
+}
 
-  stopLoop();
+function finishExport(){
 
-});
+ if(recorder&&recorder.state!=='inactive'){
 
-video.addEventListener('error', () => {
+  try{recorder.stop();}catch(e){cleanup();}
 
-  $('videoStatus').textContent =
+ }
 
-    'Impossible de lire cette vidéo. Essaie un fichier MP4 H.264.';
+}
 
-});
+$('stopExport').addEventListener('click',finishExport);
 
-$('videoFile').addEventListener('change', event => {
+$('export').addEventListener('click',async()=>{
 
-  const file = event.target.files && event.target.files[0];
+ if(!video.videoWidth)return $('exportStatus').textContent='Importe une vidéo lisible.';
 
-  if (!file) return;
+ if(!canvas.captureStream||!window.MediaRecorder)return $('exportStatus').textContent='Export canvas non pris en charge par ce navigateur.';
 
-  stopLoop();
+ if(!Number.isFinite(video.duration)||video.duration<=0)return $('exportStatus').textContent='Durée indisponible.';
 
-  if (videoURL) URL.revokeObjectURL(videoURL);
+ if(video.duration>600)return $('exportStatus').textContent='Limite : 10 minutes par export.';
 
-  videoURL = URL.createObjectURL(file);
+ const mime=[
+
+  'video/mp4;codecs=avc1.42E01E',
+
+  'video/mp4',
+
+  'video/webm;codecs=vp8',
+
+  'video/webm'
+
+ ].find(m=>{try{return MediaRecorder.isTypeSupported(m);}catch(e){return false;}});
+
+ if(!mime)return $('exportStatus').textContent='Aucun format vidéo compatible détecté.';
+
+ chunks=[];
+
+ $('download').classList.add('hidden');
+
+ $('export').disabled=true;
+
+ $('stopExport').disabled=false;
+
+ try{
 
   video.pause();
 
-  video.src = videoURL;
+  video.currentTime=0;
 
-  video.load();
+  await new Promise(resolve=>{
 
-  $('export').disabled = true;
+   if(video.currentTime===0&&video.readyState>=2)return resolve();
 
-  $('download').classList.add('hidden');
+   const done=()=>{
 
-  $('empty').classList.remove('hidden');
+    video.removeEventListener('seeked',done);
 
-  $('videoStatus').textContent =
+    resolve();
 
-    'Chargement : ' + file.name + ' · ' +
+   };
 
-    (file.size / 1048576).toFixed(1) + ' Mo';
+   video.addEventListener('seeked',done);
 
-});
-
-/* Commandes de lecture */
-
-$('previewPlay').addEventListener('click', async () => {
-
-  try {
-
-    await video.play();
-
-    startLoop();
-
-    drawFrame();
-
-    $('videoStatus').textContent =
-
-      'Lecture en cours : regarde le canvas en dessous pour voir les corrections.';
-
-  } catch (error) {
-
-    $('videoStatus').textContent =
-
-      'Lecture bloquée. Appuie sur Lecture dans le lecteur vidéo original.';
-
-  }
-
-});
-
-$('previewPause').addEventListener('click', () => {
-
-  video.pause();
-
-  drawFrame();
-
-});
-
-/* Lecture du preset FFX : détection de noms uniquement */
-
-$('presetFile').addEventListener('change', async event => {
-
-  const file = event.target.files && event.target.files[0];
-
-  if (!file) return;
-
-  $('effects').innerHTML = '';
-
-  $('presetStatus').textContent =
-
-    'Fichier chargé : ' + file.name + '. Recherche de noms lisibles…';
-
-  try {
-
-    const bytes = new Uint8Array(await file.arrayBuffer());
-
-    let text = '';
-
-    for (const byte of bytes) {
-
-      text += (byte >= 32 && byte <= 126)
-
-        ? String.fromCharCode(byte)
-
-        : ' ';
-
-    }
-
-    const names = [
-
-      'Magic Bullet Looks',
-
-      'Hue/Saturation',
-
-      'S_Sharpen',
-
-      'Unsharp Mask',
-
-      'BCC Unsharp Mask',
-
-      'Sapphire',
-
-      'Boris FX'
-
-    ];
-
-    const found = names.filter(name =>
-
-      text.toLowerCase().includes(name.toLowerCase())
-
-    );
-
-    if (found.length) {
-
-      $('effects').innerHTML = found
-
-        .map(name => '<span class="effect">' + name + '</span>')
-
-        .join('');
-
-      $('presetStatus').textContent =
-
-        'Noms repérés : ' + found.join(', ') +
-
-        '. Les paramètres du FFX ne sont pas appliqués automatiquement.';
-
-    } else {
-
-      $('presetStatus').textContent =
-
-        'Aucun nom connu lisible. Ce prototype ne sait pas décoder les paramètres binaires du FFX.';
-
-    }
-
-  } catch (error) {
-
-    $('presetStatus').textContent = 'Impossible de lire ce fichier.';
-
-  }
-
-});
-
-/* Mise à jour en direct des corrections */
-
-sliders.forEach(id => {
-
-  $(id).addEventListener('input', () => {
-
-    updateLabels();
-
-    drawFrame();
+   setTimeout(done,1500);
 
   });
 
-});
+  drawFrame(true);
 
-$('reset').addEventListener('click', () => {
+  recordingStream=canvas.captureStream(30);
 
-  const defaults = {
+  recorder=new MediaRecorder(recordingStream,{mimeType:mime});
 
-    brightness: 100,
+  recorder.ondataavailable=e=>{
 
-    contrast: 100,
-
-    saturation: 100,
-
-    hue: 0,
-
-    warmth: 0
+   if(e.data&&e.data.size)chunks.push(e.data);
 
   };
 
-  for (const id of sliders) {
+  recorder.onerror=()=>{
 
-    $(id).value = defaults[id];
+   $('exportStatus').textContent='Erreur pendant l’export.';
 
-  }
+   cleanup();
 
-  updateLabels();
+  };
 
-});
+  recorder.onstop=()=>{
 
-/* Nettoyage de l'export */
+   const blob=new Blob(chunks,{type:mime});
 
-function cleanup() {
+   if(downloadURL)URL.revokeObjectURL(downloadURL);
 
-  if (exportTimeout) {
+   downloadURL=URL.createObjectURL(blob);
 
-    clearTimeout(exportTimeout);
+   const a=$('download');
 
-    exportTimeout = null;
+   const ext=mime.includes('mp4')?'mp4':'webm';
 
-  }
+   a.href=downloadURL;
 
-  if (recordingStream) {
+   a.download='colorpreset-export.'+ext;
 
-    recordingStream.getTracks().forEach(track => track.stop());
+   a.textContent='Télécharger la vidéo corrigée ('+(blob.size/1048576).toFixed(1)+' Mo)';
 
-    recordingStream = null;
+   a.classList.remove('hidden');
 
-  }
+   $('exportStatus').textContent='Export terminé. Les FPS réels dépendent du navigateur.';
 
-  $('export').disabled = !video.videoWidth;
+   cleanup();
 
-  $('stopExport').disabled = true;
+   video.pause();
 
-}
+   drawFrame(true);
 
-function finishExport() {
+  };
 
-  if (recorder && recorder.state !== 'inactive') {
+  await video.play();
 
-    try {
+  startLoop();
 
-      recorder.stop();
+  drawFrame(true);
 
-    } catch (error) {
+  recorder.start(500);
 
-      cleanup();
+  const tick=()=>{
 
-    }
+   if(!recorder||recorder.state!=='recording')return;
 
-  }
+   $('exportStatus').textContent='Export en cours : '+video.currentTime.toFixed(1)+' / '+video.duration.toFixed(1)+' s';
 
-}
+   if(video.ended||video.currentTime>=video.duration-.05){
 
-$('stopExport').addEventListener('click', finishExport);
-
-/* Export du canvas corrigé */
-
-$('export').addEventListener('click', async () => {
-
-  if (!video.videoWidth) {
-
-    $('exportStatus').textContent = 'Importe une vidéo lisible.';
+    finishExport();
 
     return;
 
-  }
+   }
 
-  if (!canvas.captureStream || !window.MediaRecorder) {
+   exportTimeout=setTimeout(tick,150);
 
-    $('exportStatus').textContent =
+  };
 
-      'Ce navigateur ne prend pas en charge l’export du canvas.';
+  tick();
 
-    return;
+ }catch(e){
 
-  }
+  $('exportStatus').textContent='Export impossible : '+e.message;
 
-  if (!Number.isFinite(video.duration) || video.duration <= 0) {
+  if(recorder&&recorder.state==='recording')recorder.stop();
 
-    $('exportStatus').textContent = 'Durée indisponible.';
+  cleanup();
 
-    return;
-
-  }
-
-  if (video.duration > 600) {
-
-    $('exportStatus').textContent =
-
-      'Limite de cette version : 10 minutes.';
-
-    return;
-
-  }
-
-  let mime = '';
-
-  const formats = [
-
-    'video/mp4;codecs=avc1.42E01E',
-
-    'video/mp4',
-
-    'video/webm;codecs=vp9',
-
-    'video/webm;codecs=vp8',
-
-    'video/webm'
-
-  ];
-
-  for (const format of formats) {
-
-    try {
-
-      if (MediaRecorder.isTypeSupported(format)) {
-
-        mime = format;
-
-        break;
-
-      }
-
-    } catch (error) {}
-
-  }
-
-  if (!mime) {
-
-    $('exportStatus').textContent =
-
-      'Aucun format d’export compatible détecté.';
-
-    return;
-
-  }
-
-  chunks = [];
-
-  $('download').classList.add('hidden');
-
-  $('export').disabled = true;
-
-  $('stopExport').disabled = false;
-
-  $('exportStatus').textContent =
-
-    'Préparation… garde cette page ouverte au premier plan.';
-
-  try {
-
-    video.pause();
-
-    if (video.currentTime !== 0) {
-
-      video.currentTime = 0;
-
-      await new Promise((resolve, reject) => {
-
-        let finished = false;
-
-        const timeout = setTimeout(() => {
-
-          if (!finished) {
-
-            finished = true;
-
-            reject(new Error('Impossible de revenir au début'));
-
-          }
-
-        }, 8000);
-
-        const onSeek = () => {
-
-          if (finished) return;
-
-          finished = true;
-
-          clearTimeout(timeout);
-
-          video.removeEventListener('seeked', onSeek);
-
-          resolve();
-
-        };
-
-        video.addEventListener('seeked', onSeek);
-
-      });
-
-    }
-
-    drawFrame();
-
-    // 60 FPS est une demande, pas une garantie de fréquence réelle.
-
-    recordingStream = canvas.captureStream(60);
-
-    recorder = new MediaRecorder(recordingStream, {
-
-      mimeType: mime
-
-    });
-
-    recorder.ondataavailable = event => {
-
-      if (event.data && event.data.size) {
-
-        chunks.push(event.data);
-
-      }
-
-    };
-
-    recorder.onerror = () => {
-
-      $('exportStatus').textContent =
-
-        'Erreur pendant l’export. Essaie une vidéo plus courte.';
-
-      cleanup();
-
-    };
-
-    recorder.onstop = () => {
-
-      const blob = new Blob(chunks, { type: mime });
-
-      if (downloadURL) URL.revokeObjectURL(downloadURL);
-
-      downloadURL = URL.createObjectURL(blob);
-
-      const link = $('download');
-
-      const extension = mime.includes('mp4') ? 'mp4' : 'webm';
-
-      link.href = downloadURL;
-
-      link.download = 'colorpreset-export.' + extension;
-
-      link.textContent =
-
-        'Télécharger la vidéo corrigée (' +
-
-        (blob.size / 1048576).toFixed(1) + ' Mo)';
-
-      link.classList.remove('hidden');
-
-      $('exportStatus').textContent =
-
-        'Export terminé. Vérifie le résultat : Safari ne garantit pas les FPS demandés.';
-
-      cleanup();
-
-      video.pause();
-
-      drawFrame();
-
-    };
-
-    await video.play();
-
-    startLoop();
-
-    drawFrame();
-
-    recorder.start(1000);
-
-    exportStartedAt = performance.now();
-
-    const tick = () => {
-
-      if (!recorder || recorder.state !== 'recording') return;
-
-      const elapsed = (performance.now() - exportStartedAt) / 1000;
-
-      $('exportStatus').textContent =
-
-        'Export en cours : ' +
-
-        Math.min(elapsed, video.duration).toFixed(1) +
-
-        ' / ' + video.duration.toFixed(1) + ' s';
-
-      if (
-
-        video.ended ||
-
-        video.currentTime >= video.duration - 0.08 ||
-
-        elapsed >= video.duration
-
-      ) {
-
-        finishExport();
-
-        return;
-
-      }
-
-      exportTimeout = setTimeout(tick, 200);
-
-    };
-
-    exportTimeout = setTimeout(tick, 200);
-
-  } catch (error) {
-
-    $('exportStatus').textContent =
-
-      'Export impossible : ' +
-
-      (error && error.message ? error.message : 'erreur inconnue') +
-
-      '. Essaie un MP4 H.264 plus court.';
-
-    if (recorder && recorder.state === 'recording') {
-
-      try {
-
-        recorder.stop();
-
-      } catch (error) {}
-
-    }
-
-    cleanup();
-
-  }
+ }
 
 });
 
