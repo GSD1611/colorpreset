@@ -1,31 +1,847 @@
+
+
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#101015"><title>ColorPreset v0.4</title>
+
+<html lang="fr">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+<meta name="theme-color" content="#101015">
+
+<title>ColorPreset v0.5</title>
+
 <style>
-:root{color-scheme:dark;--bg:#101015;--panel:#1b1b24;--line:#30303c;--text:#f4f2fa;--muted:#aaa8bb;--accent:#b8a1ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}main{max-width:760px;margin:auto;padding:18px 14px 40px}.brand{display:flex;gap:12px;align-items:center;margin:4px 0 18px}.logo{width:46px;height:46px;border-radius:14px;background:#30264a;display:grid;place-items:center;font-size:24px}.sub{color:var(--muted);font-size:13px}h1{font-size:22px;margin:0}h2{font-size:16px;margin:0 0 12px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin:12px 0}.file{display:block;width:100%;margin-top:8px;padding:12px;background:#111118;border:1px dashed #5b536f;border-radius:12px;color:var(--text)}.preview{width:100%;aspect-ratio:16/9;background:#09090d;border-radius:12px;overflow:hidden;display:grid;place-items:center;margin-top:12px}.preview canvas{width:100%;height:100%;object-fit:contain}.empty{text-align:center;color:var(--muted);padding:22px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.status{font-size:13px;color:var(--muted);line-height:1.5;margin-top:9px}.control{margin:15px 0}.control label{display:flex;justify-content:space-between;margin-bottom:8px}.control output{color:var(--accent);font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--accent)}button{border:0;border-radius:12px;background:var(--accent);color:#171222;font-weight:700;padding:13px 15px;width:100%;font-size:15px;margin-top:8px}button.secondary{background:#302b3d;color:#f4f2fa}button:disabled{opacity:.45}.pill{display:inline-block;background:#302b3d;border-radius:20px;padding:5px 9px;font-size:12px;color:#ddd4ff}.effects{display:flex;flex-wrap:wrap;gap:6px}.effect{background:#252331;border:1px solid #49435d;border-radius:8px;padding:7px 9px;font-size:12px}.warning{color:#ffcf8c}.good{color:#a9e5bd}.foot{font-size:12px;color:var(--muted);line-height:1.5}.hidden{display:none}video.source-video{position:fixed;width:2px;height:2px;left:-10px;bottom:0;opacity:.01;pointer-events:none}
-</style></head><body><main>
-<div class="brand"><div class="logo">✦</div><div><h1>ColorPreset</h1><div class="sub">Prototype 0.4 · aperçu et export corrigés</div></div></div>
-<div class="panel"><h2>1. Importer ton edit</h2><div class="sub">Choisis une vidéo depuis Fichiers ou ta galerie.</div><input class="file" id="videoFile" type="file" accept="video/*"><div class="preview"><canvas id="canvas" width="960" height="540"></canvas><div class="empty" id="empty">L'aperçu de ta vidéo apparaîtra ici.</div></div><div class="status" id="videoStatus">Aucune vidéo sélectionnée.</div></div>
-<div class="panel"><h2>2. Importer ton preset After Effects</h2><div class="sub">Le site repère certains noms d'effets dans le fichier. Il ne sait pas encore décoder intégralement les données binaires d'un FFX.</div><input class="file" id="presetFile" type="file" accept=".ffx,application/octet-stream"><div class="status" id="presetStatus">Aucun preset sélectionné.</div><div class="effects" id="effects"></div></div>
-<div class="panel"><div class="row"><h2>3. Régler la color correction</h2><span class="pill">Aperçu en direct</span></div>
-<div class="control"><label for="brightness">Luminosité <output id="brightnessOut">100%</output></label><input id="brightness" type="range" min="50" max="160" value="100"></div>
-<div class="control"><label for="contrast">Contraste <output id="contrastOut">100%</output></label><input id="contrast" type="range" min="50" max="180" value="100"></div>
-<div class="control"><label for="saturation">Saturation <output id="saturationOut">100%</output></label><input id="saturation" type="range" min="0" max="200" value="100"></div>
-<div class="control"><label for="hue">Teinte <output id="hueOut">0°</output></label><input id="hue" type="range" min="-180" max="180" value="0"></div>
-<div class="control"><label for="warmth">Chaleur <output id="warmthOut">0</output></label><input id="warmth" type="range" min="-40" max="40" value="0"></div>
-<button class="secondary" id="reset">Réinitialiser les réglages</button><div class="status">Les réglages ci-dessus sont de vrais effets d'aperçu. Ils ne sont pas extraits automatiquement du preset FFX : ils servent à commencer une correction manuelle.</div></div>
-<div class="panel"><h2>4. Exporter le résultat</h2><div class="status">L'export enregistre l'aperçu traité dans un fichier vidéo. Le format dépend de ce que ton navigateur prend en charge (souvent WebM). Garde la page ouverte pendant l'export.</div><button id="export" disabled>Exporter la vidéo corrigée</button><div class="status" id="exportStatus"></div><a id="download" class="hidden" download="colorpreset-export.webm">Télécharger la vidéo exportée</a></div>
-<div class="panel foot"><b>Limites actuelles</b><br>Cette version applique luminosité, contraste, saturation, teinte et chaleur à la vidéo. Elle ne reproduit pas encore automatiquement le vrai preset .ffx, notamment Magic Bullet Looks, Sapphire ou Boris FX. L'export dépend des capacités de ton navigateur et peut être moins compatible que MP4.</div>
-</main><video id="source" class="source-video" playsinline muted loop preload="metadata"></video>
+
+:root{color-scheme:dark;--bg:#101015;--panel:#1b1b24;--line:#30303c;--text:#f4f2fa;--muted:#aaa8bb;--accent:#b8a1ff}
+
+*{box-sizing:border-box}
+
+body{margin:0;background:var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+
+main{max-width:760px;margin:auto;padding:18px 14px 40px}
+
+.brand{display:flex;gap:12px;align-items:center;margin:4px 0 18px}
+
+.logo{width:46px;height:46px;border-radius:14px;background:#30264a;display:grid;place-items:center;font-size:24px}
+
+.sub{color:var(--muted);font-size:13px}
+
+h1{font-size:22px;margin:0}
+
+h2{font-size:16px;margin:0 0 12px}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin:12px 0}
+
+.file{display:block;width:100%;margin-top:8px;padding:12px;background:#111118;border:1px dashed #5b536f;border-radius:12px;color:var(--text)}
+
+.preview{width:100%;aspect-ratio:16/9;background:#09090d;border-radius:12px;overflow:hidden;display:grid;place-items:center;margin-top:12px;position:relative}
+
+.preview canvas{width:100%;height:100%;object-fit:contain}
+
+.empty{text-align:center;color:var(--muted);padding:22px;position:absolute;pointer-events:none}
+
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+
+.status{font-size:13px;color:var(--muted);line-height:1.5;margin-top:9px;overflow-wrap:anywhere}
+
+.control{margin:15px 0}
+
+.control label{display:flex;justify-content:space-between;margin-bottom:8px}
+
+.control output{color:var(--accent);font-variant-numeric:tabular-nums}
+
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+button{border:0;border-radius:12px;background:var(--accent);color:#171222;font-weight:700;padding:13px 15px;width:100%;font-size:15px;margin-top:8px}
+
+button.secondary{background:#302b3d;color:#f4f2fa}
+
+button:disabled{opacity:.45}
+
+.pill{display:inline-block;background:#302b3d;border-radius:20px;padding:5px 9px;font-size:12px;color:#ddd4ff}
+
+.effects{display:flex;flex-wrap:wrap;gap:6px}
+
+.effect{background:#252331;border:1px solid #49435d;border-radius:8px;padding:7px 9px;font-size:12px}
+
+.good{color:#a9e5bd}
+
+.foot{font-size:12px;color:var(--muted);line-height:1.5}
+
+.hidden{display:none}
+
+video.source-video{position:fixed;width:2px;height:2px;left:-10px;bottom:0;opacity:.01;pointer-events:none}
+
+a{display:inline-block;color:#ddd4ff;margin-top:12px;overflow-wrap:anywhere}
+
+</style>
+
+</head>
+
+<body>
+
+<main>
+
+<div class="brand">
+
+<div class="logo">✦</div>
+
+<div>
+
+<h1>ColorPreset</h1>
+
+<div class="sub">Prototype 0.5 · correction et export améliorés</div>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>1. Importer ton edit</h2>
+
+<div class="sub">Choisis une vidéo depuis Fichiers ou ta galerie.</div>
+
+<input class="file" id="videoFile" type="file" accept="video/*">
+
+<div class="preview">
+
+<canvas id="canvas" width="960" height="540"></canvas>
+
+<div class="empty" id="empty">L’aperçu de ta vidéo apparaîtra ici.</div>
+
+</div>
+
+<div class="status" id="videoStatus">Aucune vidéo sélectionnée.</div>
+
+</div>
+
+<div class="panel">
+
+<h2>2. Importer ton preset After Effects</h2>
+
+<div class="sub">Le fichier FFX est analysé pour repérer des noms d’effets lisibles. Cette détection ne décode pas leurs paramètres.</div>
+
+<input class="file" id="presetFile" type="file" accept=".ffx,application/octet-stream">
+
+<div class="status" id="presetStatus">Aucun preset sélectionné.</div>
+
+<div class="effects" id="effects"></div>
+
+</div>
+
+<div class="panel">
+
+<div class="row">
+
+<h2>3. Régler la color correction</h2>
+
+<span class="pill">Aperçu en direct</span>
+
+</div>
+
+<div class="control">
+
+<label for="brightness">Luminosité <output id="brightnessOut">100%</output></label>
+
+<input id="brightness" type="range" min="50" max="160" value="100">
+
+</div>
+
+<div class="control">
+
+<label for="contrast">Contraste <output id="contrastOut">100%</output></label>
+
+<input id="contrast" type="range" min="50" max="180" value="100">
+
+</div>
+
+<div class="control">
+
+<label for="saturation">Saturation <output id="saturationOut">100%</output></label>
+
+<input id="saturation" type="range" min="0" max="200" value="100">
+
+</div>
+
+<div class="control">
+
+<label for="hue">Teinte <output id="hueOut">0°</output></label>
+
+<input id="hue" type="range" min="-180" max="180" value="0">
+
+</div>
+
+<div class="control">
+
+<label for="warmth">Chaleur <output id="warmthOut">0</output></label>
+
+<input id="warmth" type="range" min="-40" max="40" value="0">
+
+</div>
+
+<button class="secondary" id="reset">Réinitialiser les réglages</button>
+
+<div class="status">Les corrections manuelles sont appliquées au canvas utilisé pour l’export. Elles ne sont pas automatiquement extraites du preset FFX.</div>
+
+</div>
+
+<div class="panel">
+
+<h2>4. Exporter le résultat</h2>
+
+<div class="status">Le navigateur capture l’image corrigée en temps réel. La capture est demandée à 60 FPS, mais l’iPhone et le navigateur peuvent produire une fréquence plus basse. Le format dépend du navigateur.</div>
+
+<button id="export" disabled>Exporter la vidéo corrigée</button>
+
+<button class="secondary" id="stopExport" disabled>Arrêter l’export</button>
+
+<div class="status" id="exportStatus"></div>
+
+<a id="download" class="hidden" download="colorpreset-export.webm">Télécharger la vidéo exportée</a>
+
+</div>
+
+<div class="panel foot">
+
+<b>Limites actuelles</b><br>
+
+Cette version applique luminosité, contraste, saturation, teinte et une simulation de chaleur. Elle ne reproduit pas automatiquement Magic Bullet Looks, Sapphire ou Boris FX. L’export navigateur réencode la vidéo et ne garantit ni les 200 FPS d’origine, ni le débit, ni la qualité identiques au fichier source.
+
+</div>
+
+</main>
+
+<video id="source" class="source-video" playsinline muted preload="auto"></video>
+
 <script>
-const $=id=>document.getElementById(id);const video=$('source'),canvas=$('canvas'),ctx=canvas.getContext('2d');let videoURL=null,raf=0,recorder=null,chunks=[];let currentFileName='';
-const sliders=['brightness','contrast','saturation','hue','warmth'];
-function values(){return {brightness:+$('brightness').value,contrast:+$('contrast').value,saturation:+$('saturation').value,hue:+$('hue').value,warmth:+$('warmth').value}}
-function updateLabels(){for(const id of sliders){let v=+$ (id).value;$(id+'Out').textContent=id==='hue'?v+'°':id==='warmth'?(v>0?'+':'')+v:v+'%'}drawFrame()}
-function drawFrame(){if(!video.videoWidth||!video.videoHeight)return;const w=video.videoWidth,h=video.videoHeight;const maxW=1280,maxH=720;const scale=Math.min(1,maxW/w,maxH/h);const cw=Math.max(2,Math.round(w*scale)),ch=Math.max(2,Math.round(h*scale));if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch}const v=values();ctx.save();ctx.filter=`brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturation}%) hue-rotate(${v.hue}deg)`;ctx.drawImage(video,0,0,cw,ch);ctx.restore();if(v.warmth!==0){const alpha=Math.abs(v.warmth)/220;ctx.save();ctx.globalCompositeOperation='soft-light';ctx.fillStyle=v.warmth>0?`rgba(255,140,50,${alpha})`:`rgba(60,130,255,${alpha})`;ctx.fillRect(0,0,cw,ch);ctx.restore()}}
-function loop(){drawFrame();raf=requestAnimationFrame(loop)}
-$('videoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(videoURL)URL.revokeObjectURL(videoURL);cancelAnimationFrame(raf);videoURL=URL.createObjectURL(f);currentFileName=f.name;$('export').disabled=true;$('download').classList.add('hidden');$('exportStatus').textContent='';$('videoStatus').textContent=`Fichier sélectionné : ${f.name} · ${(f.size/1048576).toFixed(1)} Mo. Chargement de la vidéo…`;video.onerror=()=>{$('videoStatus').textContent='Impossible de lire cette vidéo dans ce navigateur. Essaie un MP4 H.264.';$('empty').classList.remove('hidden')};video.onloadedmetadata=()=>{if(!video.videoWidth){$('videoStatus').textContent='La vidéo est détectée, mais son format ne peut pas être décodé par ce navigateur.';return}$('empty').classList.add('hidden');$('export').disabled=false;$('videoStatus').textContent=`Vidéo prête : ${f.name} · ${video.videoWidth} × ${video.videoHeight} · ${Number.isFinite(video.duration)?video.duration.toFixed(1)+' s':'durée inconnue'}`;drawFrame();video.play().catch(()=>{$('videoStatus').textContent+=' · Appuie sur lecture si nécessaire.'});cancelAnimationFrame(raf);loop()};video.src=videoURL;video.load();});
-$('presetFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;$('effects').innerHTML='';$('presetStatus').textContent=`Fichier chargé : ${f.name} · ${(f.size/1024).toFixed(0)} Ko. Analyse des chaînes de texte…`;try{const buf=await f.arrayBuffer();const bytes=new Uint8Array(buf);let s='';for(let i=0;i<bytes.length;i++)if(bytes[i]>=32&&bytes[i]<=126)s+=String.fromCharCode(bytes[i]);else s+=' ';const names=['Magic Bullet Looks','Hue/Saturation','S_Sharpen','Unsharp Mask','BCC Unsharp Mask','Sapphire','Boris FX'];let found=names.filter(n=>s.toLowerCase().includes(n.toLowerCase()));if(found.length){$('effects').innerHTML=found.map(n=>`<span class="effect">${n}</span>`).join('');$('presetStatus').innerHTML=`<span class="good">${found.length} nom(s) d'effet repéré(s).</span> Les paramètres complets ne sont pas encore décodés.`}else{$('presetStatus').textContent='Aucun nom d’effet connu repéré en texte lisible. Le preset est probablement stocké en données binaires.'}}catch(err){$('presetStatus').textContent='Impossible de lire ce fichier dans le navigateur.'}});
-sliders.forEach(id=>$(id).addEventListener('input',updateLabels));$('reset').addEventListener('click',()=>{for(const id of sliders)$(id).value=({brightness:100,contrast:100,saturation:100,hue:0,warmth:0})[id];updateLabels()});
-$('export').addEventListener('click',async()=>{if(!video.videoWidth){$('exportStatus').textContent='Importe d’abord une vidéo lisible et attends que son aperçu apparaisse.';return}if(!canvas.captureStream){$('exportStatus').textContent='Ce navigateur ne permet pas de capturer le canvas pour exporter. Essaie d’ouvrir le fichier dans Safari plutôt que dans l’aperçu intégré.';return}const stream=canvas.captureStream(30);let mime='';for(const t of ['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']){if(window.MediaRecorder&&MediaRecorder.isTypeSupported(t)){mime=t;break}}if(!window.MediaRecorder||!mime){$('exportStatus').textContent='Ton navigateur ne prend pas en charge l’enregistrement vidéo depuis le canvas. Essaie dans Safari récent ou Chrome.';return}chunks=[];try{recorder=new MediaRecorder(stream,{mimeType:mime});recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};recorder.onstop=()=>{const blob=new Blob(chunks,{type:mime});const url=URL.createObjectURL(blob);const a=$('download');a.href=url;a.download='colorpreset-export.'+(mime.includes('mp4')?'mp4':'webm');a.classList.remove('hidden');a.textContent='Télécharger la vidéo ('+(blob.size/1048576).toFixed(1)+' Mo)';$('exportStatus').textContent='Export terminé. Appuie sur le lien pour enregistrer ou partager le fichier.';stream.getTracks().forEach(t=>t.stop())};video.currentTime=0;video.play();recorder.start();$('export').disabled=true;$('exportStatus').textContent='Export en cours… la vidéo est enregistrée en temps réel. Ne quitte pas la page.';const duration=Number.isFinite(video.duration)?video.duration:4;setTimeout(()=>{if(recorder&&recorder.state==='recording')recorder.stop();$('export').disabled=false},Math.min(Math.max(duration,1),60)*1000)}catch(err){$('exportStatus').textContent='L’export a échoué sur ce navigateur : '+err.message;$('export').disabled=false}});
+
+'use strict';
+
+const $ = id => document.getElementById(id);
+
+const video = $('source');
+
+const canvas = $('canvas');
+
+const ctx = canvas.getContext('2d', {alpha:false});
+
+let videoURL = null;
+
+let raf = 0;
+
+let recorder = null;
+
+let recordingStream = null;
+
+let chunks = [];
+
+let exportTimeout = null;
+
+let exportStartedAt = 0;
+
+const sliders = ['brightness','contrast','saturation','hue','warmth'];
+
+function values() {
+
+  return {
+
+    brightness: +$('brightness').value,
+
+    contrast: +$('contrast').value,
+
+    saturation: +$('saturation').value,
+
+    hue: +$('hue').value,
+
+    warmth: +$('warmth').value
+
+  };
+
+}
+
+function updateLabels() {
+
+  for (const id of sliders) {
+
+    const v = +$(id).value;
+
+    $(id + 'Out').textContent =
+
+      id === 'hue' ? v + '°' :
+
+      id === 'warmth' ? (v > 0 ? '+' : '') + v :
+
+      v + '%';
+
+  }
+
+  drawFrame();
+
+}
+
+function drawFrame() {
+
+  if (!video.videoWidth || !video.videoHeight) return;
+
+  const w = video.videoWidth;
+
+  const h = video.videoHeight;
+
+  const scale = Math.min(1, 1920/w, 1080/h);
+
+  const cw = Math.max(2, Math.round(w*scale));
+
+  const ch = Math.max(2, Math.round(h*scale));
+
+  if (canvas.width !== cw || canvas.height !== ch) {
+
+    canvas.width = cw;
+
+    canvas.height = ch;
+
+  }
+
+  const v = values();
+
+  ctx.save();
+
+  ctx.filter = `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturation}%) hue-rotate(${v.hue}deg)`;
+
+  ctx.drawImage(video, 0, 0, cw, ch);
+
+  ctx.restore();
+
+  if (v.warmth !== 0) {
+
+    const alpha = Math.min(.22, Math.abs(v.warmth)/220);
+
+    ctx.save();
+
+    ctx.globalCompositeOperation = 'soft-light';
+
+    ctx.fillStyle = v.warmth > 0
+
+      ? `rgba(255,140,50,${alpha})`
+
+      : `rgba(60,130,255,${alpha})`;
+
+    ctx.fillRect(0, 0, cw, ch);
+
+    ctx.restore();
+
+  }
+
+}
+
+function loop() {
+
+  drawFrame();
+
+  raf = requestAnimationFrame(loop);
+
+}
+
+function stopLoop() {
+
+  if (raf) cancelAnimationFrame(raf);
+
+  raf = 0;
+
+}
+
+$('videoFile').addEventListener('change', e => {
+
+  const f = e.target.files && e.target.files[0];
+
+  if (!f) return;
+
+  stopLoop();
+
+  if (videoURL) URL.revokeObjectURL(videoURL);
+
+  videoURL = URL.createObjectURL(f);
+
+  $('export').disabled = true;
+
+  $('download').classList.add('hidden');
+
+  $('exportStatus').textContent = '';
+
+  $('videoStatus').textContent =
+
+    `Fichier sélectionné : ${f.name} · ${(f.size/1048576).toFixed(1)} Mo. Chargement…`;
+
+  video.onerror = () => {
+
+    $('videoStatus').textContent =
+
+      'Impossible de lire cette vidéo dans ce navigateur. Essaie un MP4 H.264.';
+
+    $('empty').classList.remove('hidden');
+
+  };
+
+  video.onloadedmetadata = () => {
+
+    if (!video.videoWidth) {
+
+      $('videoStatus').textContent =
+
+        'La vidéo est détectée, mais son format ne peut pas être décodé.';
+
+      return;
+
+    }
+
+    $('empty').classList.add('hidden');
+
+    $('export').disabled = false;
+
+    $('videoStatus').textContent =
+
+      `Vidéo prête : ${f.name} · ${video.videoWidth} × ${video.videoHeight} · ${Number.isFinite(video.duration) ? video.duration.toFixed(1)+' s' : 'durée inconnue'}.`;
+
+    drawFrame();
+
+    video.currentTime = 0;
+
+    video.play().then(() => {
+
+      stopLoop();
+
+      loop();
+
+    }).catch(() => {
+
+      $('videoStatus').textContent +=
+
+        ' Appuie sur lecture ou relance la vidéo si l’aperçu reste figé.';
+
+    });
+
+  };
+
+  video.src = videoURL;
+
+  video.load();
+
+});
+
+$('presetFile').addEventListener('change', async e => {
+
+  const f = e.target.files && e.target.files[0];
+
+  if (!f) return;
+
+  $('effects').innerHTML = '';
+
+  $('presetStatus').textContent =
+
+    `Fichier chargé : ${f.name} · ${(f.size/1024).toFixed(0)} Ko. Analyse des chaînes lisibles…`;
+
+  try {
+
+    const bytes = new Uint8Array(await f.arrayBuffer());
+
+    let s = '';
+
+    for (const b of bytes) {
+
+      s += (b >= 32 && b <= 126) ? String.fromCharCode(b) : ' ';
+
+    }
+
+    const names = [
+
+      'Magic Bullet Looks',
+
+      'Hue/Saturation',
+
+      'S_Sharpen',
+
+      'Unsharp Mask',
+
+      'BCC Unsharp Mask',
+
+      'Sapphire',
+
+      'Boris FX'
+
+    ];
+
+    const found = names.filter(n =>
+
+      s.toLowerCase().includes(n.toLowerCase())
+
+    );
+
+    if (found.length) {
+
+      $('effects').innerHTML = found
+
+        .map(n => `<span class="effect">${n}</span>`)
+
+        .join('');
+
+      $('presetStatus').innerHTML =
+
+        `<span class="good">${found.length} nom(s) d’effet repéré(s).</span> Les paramètres ne sont pas décodés et aucun effet FFX n’est appliqué automatiquement.`;
+
+    } else {
+
+      $('presetStatus').textContent =
+
+        'Aucun nom connu repéré en texte lisible. Le preset peut stocker ses informations en binaire.';
+
+    }
+
+  } catch (err) {
+
+    $('presetStatus').textContent =
+
+      'Impossible de lire ce fichier dans le navigateur.';
+
+  }
+
+});
+
+sliders.forEach(id =>
+
+  $(id).addEventListener('input', updateLabels)
+
+);
+
+$('reset').addEventListener('click', () => {
+
+  const defaults = {
+
+    brightness:100,
+
+    contrast:100,
+
+    saturation:100,
+
+    hue:0,
+
+    warmth:0
+
+  };
+
+  for (const id of sliders) {
+
+    $(id).value = defaults[id];
+
+  }
+
+  updateLabels();
+
+});
+
+function cleanup() {
+
+  if (exportTimeout) {
+
+    clearTimeout(exportTimeout);
+
+    exportTimeout = null;
+
+  }
+
+  if (recordingStream) {
+
+    recordingStream.getTracks().forEach(t => t.stop());
+
+    recordingStream = null;
+
+  }
+
+  $('export').disabled = !video.videoWidth;
+
+  $('stopExport').disabled = true;
+
+}
+
+function finishExport() {
+
+  if (recorder && recorder.state !== 'inactive') {
+
+    try {
+
+      recorder.stop();
+
+    } catch (e) {
+
+      cleanup();
+
+    }
+
+  }
+
+}
+
+$('stopExport').addEventListener('click', finishExport);
+
+$('export').addEventListener('click', async () => {
+
+  if (!video.videoWidth) {
+
+    $('exportStatus').textContent = 'Importe d’abord une vidéo lisible.';
+
+    return;
+
+  }
+
+  if (!canvas.captureStream || !window.MediaRecorder) {
+
+    $('exportStatus').textContent =
+
+      'Ce navigateur ne prend pas en charge l’export canvas. Essaie Safari récent.';
+
+    return;
+
+  }
+
+  if (!Number.isFinite(video.duration) || video.duration <= 0) {
+
+    $('exportStatus').textContent = 'Durée de vidéo indisponible.';
+
+    return;
+
+  }
+
+  if (video.duration > 600) {
+
+    $('exportStatus').textContent =
+
+      'Cette version limite l’export à 10 minutes pour réduire les risques de blocage sur iPhone.';
+
+    return;
+
+  }
+
+  let mime = '';
+
+  for (const type of [
+
+    'video/mp4;codecs=avc1.42E01E',
+
+    'video/mp4',
+
+    'video/webm;codecs=vp9',
+
+    'video/webm;codecs=vp8',
+
+    'video/webm'
+
+  ]) {
+
+    try {
+
+      if (MediaRecorder.isTypeSupported(type)) {
+
+        mime = type;
+
+        break;
+
+      }
+
+    } catch (e) {}
+
+  }
+
+  if (!mime) {
+
+    $('exportStatus').textContent =
+
+      'Aucun format MediaRecorder compatible détecté.';
+
+    return;
+
+  }
+
+  chunks = [];
+
+  $('download').classList.add('hidden');
+
+  $('export').disabled = true;
+
+  $('stopExport').disabled = false;
+
+  $('exportStatus').textContent =
+
+    'Préparation de l’export… garde Safari ouvert au premier plan.';
+
+  try {
+
+    recordingStream = canvas.captureStream(60);
+
+    recorder = new MediaRecorder(recordingStream, {mimeType:mime});
+
+    recorder.ondataavailable = ev => {
+
+      if (ev.data && ev.data.size) chunks.push(ev.data);
+
+    };
+
+    recorder.onerror = () => {
+
+      $('exportStatus').textContent =
+
+        'Erreur pendant l’enregistrement. Essaie un clip plus court.';
+
+      cleanup();
+
+    };
+
+    recorder.onstop = () => {
+
+      const blob = new Blob(chunks, {type:mime});
+
+      const url = URL.createObjectURL(blob);
+
+      const a = $('download');
+
+      const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+
+      a.href = url;
+
+      a.download = 'colorpreset-export.' + ext;
+
+      a.textContent =
+
+        `Télécharger la vidéo (${(blob.size/1048576).toFixed(1)} Mo)`;
+
+      a.classList.remove('hidden');
+
+      $('exportStatus').textContent =
+
+        `Export terminé (${(blob.size/1048576).toFixed(1)} Mo). Vérifie la fréquence d’images : elle dépend du navigateur.`;
+
+      cleanup();
+
+      video.pause();
+
+    };
+
+    video.pause();
+
+    video.currentTime = 0;
+
+    await new Promise((resolve, reject) => {
+
+      let done = false;
+
+      const timeout = setTimeout(() => {
+
+        if (!done) reject(new Error('La vidéo n’a pas pu revenir au début.'));
+
+      }, 8000);
+
+      const finish = () => {
+
+        if (done) return;
+
+        done = true;
+
+        clearTimeout(timeout);
+
+        video.removeEventListener('seeked', finish);
+
+        resolve();
+
+      };
+
+      video.addEventListener('seeked', finish, {once:true});
+
+      if (video.currentTime === 0) finish();
+
+    });
+
+    drawFrame();
+
+    await video.play();
+
+    recorder.start(1000);
+
+    exportStartedAt = performance.now();
+
+    $('exportStatus').textContent =
+
+      `Export en cours : 0 / ${video.duration.toFixed(1)} s. Ne quitte pas Safari.`;
+
+    const tick = () => {
+
+      if (!recorder || recorder.state !== 'recording') return;
+
+      const elapsed = Math.min(
+
+        (performance.now() - exportStartedAt)/1000,
+
+        video.duration
+
+      );
+
+      $('exportStatus').textContent =
+
+        `Export en cours : ${elapsed.toFixed(1)} / ${video.duration.toFixed(1)} s.`;
+
+      if (
+
+        video.ended ||
+
+        elapsed >= video.duration ||
+
+        video.currentTime >= video.duration - .08
+
+      ) {
+
+        finishExport();
+
+        return;
+
+      }
+
+      exportTimeout = setTimeout(tick, 250);
+
+    };
+
+    exportTimeout = setTimeout(tick, 250);
+
+  } catch (err) {
+
+    $('exportStatus').textContent =
+
+      'L’export a échoué : ' +
+
+      (err && err.message ? err.message : 'erreur inconnue') +
+
+      '. Essaie un clip plus court.';
+
+    if (recorder && recorder.state === 'recording') {
+
+      try {
+
+        recorder.stop();
+
+      } catch (e) {}
+
+    }
+
+    cleanup();
+
+  }
+
+});
+
 updateLabels();
-</script></body></html>
+
+</script>
+
+</body>
+
+</html>
